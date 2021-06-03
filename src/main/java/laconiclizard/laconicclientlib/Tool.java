@@ -1,6 +1,7 @@
 package laconiclizard.laconicclientlib;
 
 import com.mojang.brigadier.arguments.ArgumentType;
+import com.mojang.brigadier.arguments.BoolArgumentType;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
 import net.fabricmc.fabric.api.client.command.v1.FabricClientCommandSource;
 
@@ -93,6 +94,13 @@ public interface Tool {
             this.value = (T) value;
         }
 
+    }
+
+    /** A Boolean option class, for convenience. */
+    class BooleanOption extends Option<Boolean> {
+        public BooleanOption(Boolean defaultValue) {
+            super(BoolArgumentType.bool(), boolean.class, defaultValue);
+        }
     }
 
 }
