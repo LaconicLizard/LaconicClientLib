@@ -7,7 +7,6 @@
   "authors": [],
   "contact": {},
   "license": "MIT",
-  "icon": "assets/laconic-client-lib/icon.png",
   "environment": "client",
   "entrypoints": {
     "client": [
