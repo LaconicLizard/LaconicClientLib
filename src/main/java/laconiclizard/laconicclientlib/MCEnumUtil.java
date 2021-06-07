@@ -2,7 +2,6 @@ package laconiclizard.laconicclientlib;
 
 import net.minecraft.network.MessageType;
 import net.minecraft.network.packet.s2c.play.UnlockRecipesS2CPacket;
-import net.minecraft.scoreboard.ScoreboardCriterion;
 
 /** Utils for Minecraft enums. */
 public class MCEnumUtil {

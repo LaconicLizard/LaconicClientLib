@@ -1,4 +1,4 @@
-package laconiclizard.laconicclientlib;
+package laconiclizard.laconicclientlib.entrypoints;
 
 import net.fabricmc.api.ModInitializer;
 

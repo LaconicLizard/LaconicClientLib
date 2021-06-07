@@ -10,18 +10,22 @@
   "environment": "client",
   "entrypoints": {
     "client": [
-      "laconiclizard.laconicclientlib.client.LaconicClientLibClient"
+      "laconiclizard.laconicclientlib.entrypoints.LaconicClientLibClient"
     ],
     "main": [
-      "laconiclizard.laconicclientlib.LaconicClientLib"
+      "laconiclizard.laconicclientlib.entrypoints.LaconicClientLib"
     ]
   },
   "mixins": [
     "laconic-client-lib.mixins.json"
   ],
   "depends": {
+    "cloth-config2": ">=4.11.26",
     "fabricloader": ">=0.11.3",
     "fabric": "*",
     "minecraft": "1.16.5"
+  },
+  "suggests": {
+    "modmenu": ">=1.16.9"
   }
 }

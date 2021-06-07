@@ -6,7 +6,7 @@ import com.google.gson.JsonObject;
 
 /** Utility representing the various Gson-related types. */
 public enum GsonType {
-    // dev note: ordered topologically
+    // dev note: ordered topologically from narrowest to broadest
     STRING(String.class) {
         @Override public void put(JsonObject o, String key, Object value) {
             o.addProperty(key, (String) value);
