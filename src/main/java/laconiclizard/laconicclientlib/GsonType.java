@@ -41,7 +41,7 @@ public enum GsonType {
 
     /**
      * Acquire the GsonType corresponding to the given Java type.
-     * Works on primitive types (eg. int.class).
+     * Works on primitive types (eg. int.class) and null.
      *
      * @param javaType type of interest
      * @return GsonType corresponding to javaType

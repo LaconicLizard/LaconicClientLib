@@ -28,6 +28,8 @@ dependencies {
     // You may need to force-disable transitiveness on them.
 
     //noinspection GroovyAssignabilityCheck
+    // no need to include because gson is included in mc
+    // no need to exclude bc it is not bundled anyways
     implementation("com.google.code.gson:gson:$gsonVersion")
 
     modApi("me.shedaniel.cloth:cloth-config-fabric:$clothConfigVersion") {

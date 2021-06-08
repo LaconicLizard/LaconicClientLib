@@ -1,8 +1,9 @@
-package laconiclizard.laconicclientlib.func;
+package laconiclizard.laconicclientlib;
 
 import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Objects;
 import java.util.function.BiConsumer;
@@ -11,6 +12,68 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class FuncUtil {
+
+    /**
+     * The descriptor of the given class.
+     * Array types are supported.
+     *
+     * @param clazz the class of interest
+     * @return type descriptor of the given class
+     */
+    public static String classDescriptor(Class<?> clazz) {
+        Objects.requireNonNull(clazz);
+        if (clazz.isPrimitive()) {
+            if (clazz == byte.class) {
+                return "B";
+            } else if (clazz == char.class) {
+                return "C";
+            } else if (clazz == double.class) {
+                return "D";
+            } else if (clazz == float.class) {
+                return "F";
+            } else if (clazz == int.class) {
+                return "I";
+            } else if (clazz == long.class) {
+                return "J";
+            } else if (clazz == short.class) {
+                return "S";
+            } else if (clazz == boolean.class) {
+                return "Z";
+            } else {
+                throw new AssertionError("Unrecognized primitive: " + clazz);
+            }
+        }
+        if (clazz.isArray()) {
+            return "[" + classDescriptor(clazz.getComponentType()) + ";";
+        } else {
+            return clazz.getCanonicalName().replace('.', '/') + ";";
+        }
+    }
+
+    /**
+     * Descriptor fot the given method.
+     *
+     * @param method method of interest
+     * @return descriptor of method
+     */
+    public static String methodDescriptor(Method method) {
+        StringBuilder sb = new StringBuilder(classDescriptor(method.getDeclaringClass()));
+        sb.append(method.getName());
+        sb.append("(");
+        for (Class<?> pt : method.getParameterTypes()) {
+            sb.append(classDescriptor(pt));
+        }
+        sb.append(")");
+        Class<?> rt = method.getReturnType();
+        if (rt == Void.TYPE) {
+            sb.append("V");
+        } else {
+            sb.append(classDescriptor(rt));
+        }
+        return sb.toString();
+    }
+
+    // ----- ----- getters & setters ----- -----
 
     /**
      * Create a getter for the named field on the given class.
@@ -81,6 +144,7 @@ public class FuncUtil {
             throw new AssertionError("Impossible", e);
         }
         return (T instance) -> {
+            Objects.requireNonNull(instance);
             if (!clazz.isInstance(instance)) {
                 throw new ClassCastException("Attempt to retrieve field from wrong type: "
                         + fieldName + " on " + clazz + " from " + instance);
@@ -163,6 +227,7 @@ public class FuncUtil {
             throw new AssertionError("Impossible", e);
         }
         return (T instance, Object value) -> {
+            Objects.requireNonNull(instance);
             if (!clazz.isInstance(instance)) {
                 throw new ClassCastException("Attempt to set field on wrong type: "
                         + fieldName + " on " + clazz + " from " + instance);
