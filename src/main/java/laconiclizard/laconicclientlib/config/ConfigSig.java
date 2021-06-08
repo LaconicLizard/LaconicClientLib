@@ -18,16 +18,16 @@ import java.util.function.Function;
  * The "signature" of a config class.
  * Allows efficient operations that might otherwise require reflection.
  */
-public class ConfigSig<T extends ConfigData> {
+public class ConfigSig<T extends ConfigData, F extends ConfigSig.ConfigField<T, ?>> {
 
-    private static final Map<Class<? extends ConfigData>, ConfigSig<?>> CONFIG_SIGS = new ConcurrentHashMap<>();
+    private static final Map<Class<? extends ConfigData>, ConfigSig<?, ?>> CONFIG_SIGS = new ConcurrentHashMap<>();
 
     public final String name;
     public final Class<T> clazz;
     // unmodifiable map from field name -> config field
-    public final Map<String, ConfigField<T, ?>> fields;
+    public final Map<String, F> fields;
 
-    private <S> ConfigSig(Class<T> clazz) {
+    private ConfigSig(Class<T> clazz, Function<Field, F> fieldFunction) {
         // check args
         Objects.requireNonNull(clazz);
         if (!Modifier.isPublic(clazz.getModifiers()))
@@ -47,12 +47,10 @@ public class ConfigSig<T extends ConfigData> {
                     || !Modifier.isPublic(mods)) {
                 continue;
             }
-            String fname = f.getName();
-            //noinspection unchecked
-            fields.put(fname, new ConfigField<>(clazz, fname, (Function<T, S>) FuncUtil.getter(clazz, fname),
-                    (BiConsumer<T, S>) FuncUtil.setter(clazz, fname)));
+            fields.put(f.getName(), fieldFunction.apply(f));
         }
-        this.fields = Collections.unmodifiableMap(fields);
+        //noinspection unchecked
+        this.fields = (Map<String, F>) Collections.unmodifiableMap(fields);
     }
 
     /** A single field in a config class. */
@@ -63,11 +61,14 @@ public class ConfigSig<T extends ConfigData> {
         private final Function<T, V> getter;
         private final BiConsumer<T, V> setter;
 
-        private ConfigField(Class<T> clazz, String name, Function<T, V> getter, BiConsumer<T, V> setter) {
-            this.clazz = clazz;
-            this.name = name;
-            this.getter = getter;
-            this.setter = setter;
+        public ConfigField(Field f) {
+            //noinspection unchecked
+            clazz = (Class<T>) f.getDeclaringClass();
+            name = f.getName();
+            //noinspection unchecked
+            getter = (Function<T, V>) FuncUtil.getter(clazz, name);
+            //noinspection unchecked
+            setter = (BiConsumer<T, V>) FuncUtil.setter(clazz, name);
         }
 
         /**
@@ -106,13 +107,21 @@ public class ConfigSig<T extends ConfigData> {
     /**
      * Get the signature of the given config class.
      *
-     * @param clazz config class of interest
+     * @param clazz         config class of interest
+     * @param fieldFunction function taking a (public non-final instance) field -> ConfigField representing it
      * @return signature of clazz
      */
-    public static <T extends ConfigData> ConfigSig<T> getSig(Class<T> clazz) {
+    public static <T extends ConfigData, F extends ConfigField<T, ?>> ConfigSig<T, F> getSig(
+            Class<T> clazz, Function<Field, F> fieldFunction) {
         //noinspection unchecked
-        return (ConfigSig<T>) CONFIG_SIGS.computeIfAbsent(clazz, (unused) -> new ConfigSig<>(clazz));
+        return (ConfigSig<T, F>) CONFIG_SIGS.computeIfAbsent(clazz, (unused) -> new ConfigSig<>(clazz, fieldFunction));
     }
+
+    /** Convenience method for getSig(clazz, ConfigField::new) */
+    public static <T extends ConfigData> ConfigSig<T, ?> getSig(Class<T> clazz) {
+        return getSig(clazz, ConfigField::new);
+    }
+
 
     /**
      * Copy the config options from src to dest.
@@ -122,11 +131,11 @@ public class ConfigSig<T extends ConfigData> {
      * @param src  config instance from which data will be copied
      * @return dest
      */
-    public T copyInto(T dest, T src) {
+    public static <T extends ConfigData> T copyInto(T dest, T src) {
         Objects.requireNonNull(dest);
         Objects.requireNonNull(src);
         //noinspection unchecked
-        ConfigSig<T> sig = getSig((Class<T>) dest.getClass());
+        ConfigSig<T, ?> sig = getSig((Class<T>) dest.getClass());
         try {
             for (ConfigField<T, ?> f : sig.fields.values()) {
                 f.setUnchecked(dest, f.get(src));
