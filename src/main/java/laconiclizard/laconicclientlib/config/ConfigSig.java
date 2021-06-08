@@ -20,7 +20,8 @@ import java.util.function.Function;
  */
 public class ConfigSig<T extends ConfigData, F extends ConfigSig.ConfigField<T, ?>> {
 
-    private static final Map<Class<? extends ConfigData>, ConfigSig<?, ?>> CONFIG_SIGS = new ConcurrentHashMap<>();
+    private static final Map<Class<? extends ConfigData>,
+            Map<Function<Field, ? extends ConfigField<?, ?>>, ConfigSig<?, ?>>> CONFIG_SIGS = new ConcurrentHashMap<>();
 
     public final String name;
     public final Class<T> clazz;
@@ -114,7 +115,8 @@ public class ConfigSig<T extends ConfigData, F extends ConfigSig.ConfigField<T, 
     public static <T extends ConfigData, F extends ConfigField<T, ?>> ConfigSig<T, F> getSig(
             Class<T> clazz, Function<Field, F> fieldFunction) {
         //noinspection unchecked
-        return (ConfigSig<T, F>) CONFIG_SIGS.computeIfAbsent(clazz, (unused) -> new ConfigSig<>(clazz, fieldFunction));
+        return (ConfigSig<T, F>) CONFIG_SIGS.computeIfAbsent(clazz, unused -> new ConcurrentHashMap<>())
+                .computeIfAbsent(fieldFunction, (unused) -> new ConfigSig<>(clazz, fieldFunction));
     }
 
     /** Convenience method for getSig(clazz, ConfigField::new) */
