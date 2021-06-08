@@ -52,7 +52,7 @@ public class InstanceSerializer<T extends ConfigData> implements CustomSerialize
             if (backer == null) {
                 throw new IllegalStateException("No dest set when attempting to deserialize");
             }
-            ConfigSig<T> sig = ConfigSig.getSig(clazz);
+            ConfigSig<T, ?> sig = ConfigSig.getSig(clazz);
             return sig.copyInto(sig.createDefault(), backer);
         }
     }

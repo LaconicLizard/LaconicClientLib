@@ -131,13 +131,14 @@ public class ConfigSig<T extends ConfigData, F extends ConfigSig.ConfigField<T, 
      * @param src  config instance from which data will be copied
      * @return dest
      */
-    public static <T extends ConfigData> T copyInto(T dest, T src) {
+    public T copyInto(T dest, T src) {
         Objects.requireNonNull(dest);
         Objects.requireNonNull(src);
-        //noinspection unchecked
-        ConfigSig<T, ?> sig = getSig((Class<T>) dest.getClass());
+        if (clazz != dest.getClass()) {
+            throw new IllegalArgumentException("Attempt to copy into config of wrong type: " + dest + " using " + this);
+        }
         try {
-            for (ConfigField<T, ?> f : sig.fields.values()) {
+            for (ConfigField<T, ?> f : fields.values()) {
                 f.setUnchecked(dest, f.get(src));
             }
         } catch (Throwable t) {
