@@ -1,7 +1,7 @@
 package laconiclizard.laconicclientlib.mixin;
 
 import com.mojang.brigadier.arguments.ArgumentType;
-import laconiclizard.laconicclientlib.ContextualArgumentType;
+import laconiclizard.laconicclientlib.command.ContextualArgumentType;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(ArgumentType.class)

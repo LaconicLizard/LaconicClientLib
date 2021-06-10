@@ -1,4 +1,4 @@
-package laconiclizard.laconicclientlib;
+package laconiclizard.laconicclientlib.command;
 
 import com.mojang.brigadier.StringReader;
 import com.mojang.brigadier.arguments.ArgumentType;

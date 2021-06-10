@@ -1,3 +1,6 @@
 {
-  "commands.laconic-client-lib.incomplete_sequential_args": "Incomplete command"
+  "commands.laconic-client-lib.too_short": "Input too short, expected %d characters",
+  "commands.laconic-client-lib.expected_literal": "Expected %s",
+  "commands.laconic-client-lib.no_such_option": "No such option %s",
+  "commands.laconic-client-lib.invalid_json": "Invalid json; %s"
 }
