@@ -4,6 +4,8 @@
   "package": "laconiclizard.laconicclientlib.mixin",
   "compatibilityLevel": "JAVA_8",
   "mixins": [
+    "ArgumentCommandNode_Mixin",
+    "ArgumentType_Mixin"
   ],
   "client": [
   ],
